@@ -1,12 +1,15 @@
 from django.http.response import JsonResponse  
 from rest_framework.response import Response
 from django.shortcuts import render
-from tickets.models import Guest,Moive,Reservation
-from .serializers import GuestSerializer,MovieSerializer,ReservationSerializer
+from tickets.models import Guest,Moive,Reservation ,Post
+from .serializers import GuestSerializer,MovieSerializer,ReservationSerializer , PostSerializer
 from rest_framework.decorators import api_view
 from rest_framework import status, filters , mixins, generics , viewsets
 from rest_framework.views import APIView
 from django.http import Http404
+from rest_framework.authentication import BasicAuthentication , TokenAuthentication   
+from rest_framework.permissions import IsAuthenticated
+from .permissions import  IsAuthorOrReadOnly
 
 # 1- without REST and no model query FBV
 
@@ -242,6 +245,8 @@ class mixins_pk(mixins.RetrieveModelMixin,mixins.UpdateModelMixin,mixins.Destroy
 class generics_list(generics.ListCreateAPIView):
     queryset = Guest.objects.all()
     serializer_class = GuestSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes= [IsAuthenticated]
 
 
 # 6.2 get put and delete
@@ -249,6 +254,8 @@ class generics_list(generics.ListCreateAPIView):
 class generics_pk (generics.RetrieveUpdateDestroyAPIView):
     queryset = Guest.objects.all()
     serializer_class = GuestSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes= [IsAuthenticated]
 
 
 # 7 viewsets
@@ -297,12 +304,8 @@ def new_reservation(request):
     guest.save()
 
     reservation = Reservation.objects.create(moive=movie,guest=guest)
-    print(reservation.guest.name)
-    print(reservation.guest.mobile)
-    print(reservation.moive.movie)
-    print(reservation.moive.hall)
 
-    reservation.save()
+    #reservation.save() -> this line is useless 
 
     return Response({'data':
                      
@@ -319,3 +322,17 @@ def new_reservation(request):
                      },
                      
                      status=status.HTTP_201_CREATED)
+
+
+
+# @api_view(['GET','POST'])
+# def manipulate_read_post(request,pk):
+#     if 
+#     pass
+
+# 10 post author editor
+class Post_pk(generics.RetrieveUpdateDestroyAPIView):
+    
+    queryset= Post.objects.all()
+    serializer_class = PostSerializer
+    permission_classes = [IsAuthorOrReadOnly]

@@ -38,10 +38,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "tickets", "rest_framework",
+    "tickets", 
+    "rest_framework",
+    'rest_framework.authtoken',
 ]
 
-REST_FRAMEWORK = {}
+REST_FRAMEWORK = {
+
+'DEFAULT_AUTHENTICATION_CLASSES': ['rest_framework.authentication.TokenAuthentication', ],
+# 'DEFAULT_PERMISSION_CLASSES': ['rest_framework.permissions.IsAuthenticated'],
+
+}
+
+# Type of Permission
+# AllowAny \\ IsAuthenticated \\ IsAdminuser \\ IsAuthenticatedReadOnly
+# what if we have blog ?
+# blog  -> post > post.auther --edit post ?????
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
